@@ -1,2 +1,517 @@
-<html>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>학부 수학 교실</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            background: white;
+            border-radius: 10px;
+            padding: 40px 20px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        header h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+        
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .course-card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .course-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        }
+        
+        .course-card h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.5em;
+        }
+        
+        .course-card p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        
+        .course-card .topics {
+            font-size: 0.9em;
+            color: #999;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+        }
+        
+        .content {
+            display: none;
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .content.active {
+            display: block;
+        }
+        
+        .back-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-bottom: 20px;
+            transition: background 0.3s;
+        }
+        
+        .back-btn:hover {
+            background: #764ba2;
+        }
+        
+        .content h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+        
+        .lesson {
+            margin-bottom: 40px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            border-radius: 5px;
+        }
+        
+        .lesson h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+        
+        .lesson-content {
+            line-height: 1.8;
+            color: #555;
+            margin-bottom: 15px;
+        }
+        
+        .formula {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+        
+        .example {
+            background: #e8f4f8;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            border-left: 4px solid #0088cc;
+        }
+        
+        .example strong {
+            color: #0088cc;
+        }
+        
+        .quiz {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .quiz-question {
+            margin: 15px 0;
+            padding: 10px;
+        }
+        
+        .quiz-options {
+            margin: 10px 0 15px 20px;
+        }
+        
+        .quiz-options label {
+            display: block;
+            margin: 8px 0;
+            cursor: pointer;
+        }
+        
+        .submit-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background 0.3s;
+        }
+        
+        .submit-btn:hover {
+            background: #218838;
+        }
+        
+        .home-view {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="home" class="home-view">
+            <header>
+                <h1>📚 학부 수학 교실</h1>
+                <p>대학 수학 과정을 쉽고 재미있게 배워보세요!</p>
+            </header>
+            
+            <div class="courses-grid">
+                <div class="course-card" onclick="openCourse('calculus')">
+                    <h3>📈 미적분학</h3>
+                    <p>극한, 미분, 적분의 기본 개념을 학습합니다.</p>
+                    <div class="topics">
+                        • 극한의 정의 • 미분법 • 적분법 • 응용
+                    </div>
+                </div>
+                
+                <div class="course-card" onclick="openCourse('linear')">
+                    <h3>🔢 선형대수</h3>
+                    <p>벡터, 행렬, 선형변환의 기초를 익힙니다.</p>
+                    <div class="topics">
+                        • 행렬 • 벡터 • 고유값 • 대각화
+                    </div>
+                </div>
+                
+                <div class="course-card" onclick="openCourse('statistics')">
+                    <h3>📊 확률과 통계</h3>
+                    <p>데이터 분석과 통계의 기본 개념을 배웁니다.</p>
+                    <div class="topics">
+                        • 확률 • 분포 • 표본 • 검정
+                    </div>
+                </div>
+                
+                <div class="course-card" onclick="openCourse('ode')">
+                    <h3>➡️ 미분방정식</h3>
+                    <p>1계, 2계 미분방정식의 풀이 방법을 학습합니다.</p>
+                    <div class="topics">
+                        • 1계 ODE • 2계 ODE • 선형 방정식
+                    </div>
+                </div>
+                
+                <div class="course-card" onclick="openCourse('analysis')">
+                    <h3>∞ 실해석학</h3>
+                    <p>수렴, 연속성, 미분가능성의 엄밀한 정의를 배웁니다.</p>
+                    <div class="topics">
+                        • 수열 • 급수 • 연속성 • 미분가능성
+                    </div>
+                </div>
+                
+                <div class="course-card" onclick="openCourse('algebra')">
+                    <h3>🎯 추상대수</h3>
+                    <p>군, 환, 체의 기본 구조를 이해합니다.</p>
+                    <div class="topics">
+                        • 군론 • 환론 • 체론
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 미적분학 -->
+        <div id="calculus" class="content">
+            <button class="back-btn" onclick="backHome()">← 홈으로</button>
+            <h2>📈 미적분학</h2>
+            
+            <div class="lesson">
+                <h3>1. 극한 (Limits)</h3>
+                <div class="lesson-content">
+                    극한은 함수가 특정 값에 접근하는 거동을 나타냅니다.
+                </div>
+                <div class="formula">
+                    $$\lim_{x \to a} f(x) = L$$
+                    이는 $x$가 $a$에 충분히 가까워질 때, $f(x)$가 $L$에 임의로 가까워짐을 의미합니다.
+                </div>
+                <div class="example">
+                    <strong>예제:</strong> $\lim_{x \to 2} (x^2 + 1) = 5$
+                </div>
+            </div>
+            
+            <div class="lesson">
+                <h3>2. 미분 (Derivatives)</h3>
+                <div class="lesson-content">
+                    미분은 함수의 순간 변화율을 나타냅니다.
+                </div>
+                <div class="formula">
+                    $$f'(x) = \lim_{h \to 0} \frac{f(x+h) - f(x)}{h}$$
+                </div>
+                <div class="example">
+                    <strong>기본 미분 규칙:</strong><br>
+                    • Power Rule: $(x^n)' = nx^{n-1}$<br>
+                    • Product Rule: $(uv)' = u'v + uv'$<br>
+                    • Chain Rule: $(f(g(x)))' = f'(g(x)) \cdot g'(x)$
+                </div>
+            </div>
+            
+            <div class="lesson">
+                <h3>3. 적분 (Integration)</h3>
+                <div class="lesson-content">
+                    적분은 미분의 역연산이며, 넓이를 구하는 데 사용됩니다.
+                </div>
+                <div class="formula">
+                    $$\int f(x) dx = F(x) + C$$
+                    여기서 $F'(x) = f(x)$이고 $C$는 적분상수입니다.
+                </div>
+                <div class="example">
+                    <strong>예제:</strong> $\int x^2 dx = \frac{x^3}{3} + C$
+                </div>
+            </div>
+            
+            <div class="quiz">
+                <strong>📝 연습 문제</strong>
+                <div class="quiz-question">
+                    <strong>문제 1:</strong> $f(x) = x^3 + 2x$일 때, $f'(x)$를 구하세요.
+                    <div class="quiz-options">
+                        <label><input type="radio" name="q1"> $3x^2 + 2$</label>
+                        <label><input type="radio" name="q1"> $x^2 + 2x$</label>
+                        <label><input type="radio" name="q1"> $3x^2 + 2x$</label>
+                    </div>
+                </div>
+                <button class="submit-btn" onclick="alert('풀이 검사 기능입니다.')">답 확인</button>
+            </div>
+        </div>
+        
+        <!-- 선형대수 -->
+        <div id="linear" class="content">
+            <button class="back-btn" onclick="backHome()">← 홈으로</button>
+            <h2>🔢 선형대수</h2>
+            
+            <div class="lesson">
+                <h3>1. 벡터 (Vectors)</h3>
+                <div class="lesson-content">
+                    벡터는 크기와 방향을 가진 양입니다. $\mathbb{R}^n$ 공간의 벡터를 다룹니다.
+                </div>
+                <div class="formula">
+                    $$\mathbf{v} = \begin{pmatrix} v_1 \\ v_2 \\ \vdots \\ v_n \end{pmatrix}$$
+                </div>
+                <div class="example">
+                    <strong>내적 (Dot Product):</strong> $\mathbf{u} \cdot \mathbf{v} = u_1v_1 + u_2v_2 + \cdots + u_nv_n$
+                </div>
+            </div>
+            
+            <div class="lesson">
+                <h3>2. 행렬 (Matrices)</h3>
+                <div class="lesson-content">
+                    행렬은 수를 행과 열로 배열한 직사각형 배열입니다.
+                </div>
+                <div class="formula">
+                    $$A = \begin{pmatrix} a_{11} & a_{12} & \cdots & a_{1n} \\ a_{21} & a_{22} & \cdots & a_{2n} \\ \vdots & \vdots & \ddots & \vdots \\ a_{m1} & a_{m2} & \cdots & a_{mn} \end{pmatrix}$$
+                </div>
+                <div class="example">
+                    <strong>행렬식 (Determinant):</strong> 2×2 행렬의 경우<br>
+                    $$\det(A) = ad - bc \text{ where } A = \begin{pmatrix} a & b \\ c & d \end{pmatrix}$$
+                </div>
+            </div>
+            
+            <div class="lesson">
+                <h3>3. 고유값과 고유벡터</h3>
+                <div class="lesson-content">
+                    고유값과 고유벡터는 행렬의 중요한 성질입니다.
+                </div>
+                <div class="formula">
+                    $$A\mathbf{v} = \lambda \mathbf{v}$$
+                    여기서 $\lambda$는 고유값, $\mathbf{v}$는 고유벡터입니다.
+                </div>
+            </div>
+        </div>
+        
+        <!-- 확률과 통계 -->
+        <div id="statistics" class="content">
+            <button class="back-btn" onclick="backHome()">← 홈으로</button>
+            <h2>📊 확률과 통계</h2>
+            
+            <div class="lesson">
+                <h3>1. 기본 확률</h3>
+                <div class="lesson-content">
+                    확률은 어떤 사건이 일어날 가능성을 나타냅니다.
+                </div>
+                <div class="formula">
+                    $$P(A) = \frac{\text{favorable outcomes}}{\text{total outcomes}}$$
+                </div>
+                <div class="example">
+                    <strong>예제:</strong> 주사위에서 짝수가 나올 확률 = $\frac{3}{6} = \frac{1}{2}$
+                </div>
+            </div>
+            
+            <div class="lesson">
+                <h3>2. 확률분포</h3>
+                <div class="lesson-content">
+                    정규분포는 통계에서 가장 중요한 분포입니다.
+                </div>
+                <div class="formula">
+                    $$f(x) = \frac{1}{\sigma\sqrt{2\pi}} e^{-\frac{(x-\mu)^2}{2\sigma^2}}$$
+                    여기서 $\mu$는 평균, $\sigma$는 표준편차입니다.
+                </div>
+            </div>
+            
+            <div class="lesson">
+                <h3>3. 표본과 추론</h3>
+                <div class="lesson-content">
+                    표본으로부터 모집단의 성질을 추론합니다.
+                </div>
+                <div class="example">
+                    <strong>표본평균:</strong> $\overline{x} = \frac{1}{n}\sum_{i=1}^{n} x_i$<br>
+                    <strong>표본분산:</strong> $s^2 = \frac{1}{n-1}\sum_{i=1}^{n} (x_i - \overline{x})^2$
+                </div>
+            </div>
+        </div>
+        
+        <!-- 미분방정식 -->
+        <div id="ode" class="content">
+            <button class="back-btn" onclick="backHome()">← 홈으로</button>
+            <h2>➡️ 미분방정식</h2>
+            
+            <div class="lesson">
+                <h3>1. 1계 미분방정식</h3>
+                <div class="lesson-content">
+                    가장 기본적인 형태의 미분방정식입니다.
+                </div>
+                <div class="formula">
+                    $$\frac{dy}{dx} = f(x, y)$$
+                </div>
+                <div class="example">
+                    <strong>변수분리:</strong> $\frac{dy}{dx} = g(x)h(y)$의 경우<br>
+                    $$\int \frac{dy}{h(y)} = \int g(x) dx$$
+                </div>
+            </div>
+            
+            <div class="lesson">
+                <h3>2. 2계 선형 미분방정식</h3>
+                <div class="lesson-content">
+                    상수 계수를 가진 2계 선형 미분방정식입니다.
+                </div>
+                <div class="formula">
+                    $$a\frac{d^2y}{dx^2} + b\frac{dy}{dx} + cy = f(x)$$
+                </div>
+            </div>
+        </div>
+        
+        <!-- 실해석학 -->
+        <div id="analysis" class="content">
+            <button class="back-btn" onclick="backHome()">← 홈으로</button>
+            <h2>∞ 실해석학</h2>
+            
+            <div class="lesson">
+                <h3>1. 수열의 수렴</h3>
+                <div class="lesson-content">
+                    수열의 수렴을 엄밀하게 정의합니다.
+                </div>
+                <div class="formula">
+                    $\{a_n\}$이 $L$로 수렴한다는 것은:<br>
+                    $$\forall \epsilon > 0, \exists N \in \mathbb{N} : n > N \Rightarrow |a_n - L| < \epsilon$$
+                </div>
+            </div>
+            
+            <div class="lesson">
+                <h3>2. 함수의 연속성</h3>
+                <div class="lesson-content">
+                    함수의 연속성의 엄밀한 정의입니다.
+                </div>
+                <div class="formula">
+                    함수 $f$가 점 $a$에서 연속이다:<br>
+                    $$\forall \epsilon > 0, \exists \delta > 0 : |x - a| < \delta \Rightarrow |f(x) - f(a)| < \epsilon$$
+                </div>
+            </div>
+        </div>
+        
+        <!-- 추상대수 -->
+        <div id="algebra" class="content">
+            <button class="back-btn" onclick="backHome()">← 홈으로</button>
+            <h2>🎯 추상대수</h2>
+            
+            <div class="lesson">
+                <h3>1. 군론 (Group Theory)</h3>
+                <div class="lesson-content">
+                    군은 특정 조건을 만족하는 원소의 집합입니다.
+                </div>
+                <div class="formula">
+                    집합 $G$와 연산 $*$가 군을 이루는 조건:<br>
+                    • 닫혀있음 • 결합법칙 • 항등원 존재 • 역원 존재
+                </div>
+            </div>
+            
+            <div class="lesson">
+                <h3>2. 환론 (Ring Theory)</h3>
+                <div class="lesson-content">
+                    환은 두 개의 연산을 가진 대수 구조입니다.
+                </div>
+            </div>
+            
+            <div class="lesson">
+                <h3>3. 체론 (Field Theory)</h3>
+                <div class="lesson-content">
+                    체는 덧셈과 곱셈이 정의되고 특정 조건을 만족하는 구조입니다.
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function openCourse(courseId) {
+            document.getElementById('home').style.display = 'none';
+            document.getElementById(courseId).classList.add('active');
+        }
+        
+        function backHome() {
+            document.querySelectorAll('.content').forEach(el => {
+                el.classList.remove('active');
+            });
+            document.getElementById('home').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
   
